@@ -42,7 +42,8 @@ def get_date(date_str):
 
 
 def countClosedRest(store_type, cusips, NYC_CITIES):
-    stores = set(sc.textFile('core_poi_ny.csv') \
+    stores = set(sc.textFile(sys.argv[1] if len(sys.argv)>1
+                             else 'data/share/bdm/core-places-nyc.csv') \
                  .map(lambda x: x.split(',')) \
                  .map(lambda x: (x[1], x[9], x[13])) \
                  .filter(lambda x: (x[1] in cusips) and (x[2] in NYC_CITIES)) \
@@ -52,7 +53,7 @@ def countClosedRest(store_type, cusips, NYC_CITIES):
     udfgetYear = udf(get_year, StringType())
     udfgetDate = udf(get_date, StringType())
 
-    rdd = sc.textFile('nyc_restaurant_pattern.csv') \
+    rdd = sc.textFile('data/share/bdm/weekly-patterns-nyc-2019-2020/*') \
         .mapPartitionsWithIndex(functools.partial(listDates, stores))
 
     if not rdd.isEmpty():
@@ -64,7 +65,7 @@ def countClosedRest(store_type, cusips, NYC_CITIES):
                                  expr('percentile(daily_visits, array(0.50))')[0].alias('Median'),
                                  expr('percentile(daily_visits, array(1.00))')[0].alias('Max')) \
             .orderBy('Date') \
-            .write.csv('test1/' + store_type + '.csv')
+            .write.csv(store_type + '.csv')
 
 
 for store_type in food_store:
