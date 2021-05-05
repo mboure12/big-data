@@ -63,7 +63,7 @@ def countClosedRest(store_type, cusips, NYC_CITIES):
             .groupby('Date').agg(expr('percentile(daily_visits, array(0.00))')[0].alias('Min'),
                                  expr('percentile(daily_visits, array(0.50))')[0].alias('Median'),
                                  expr('percentile(daily_visits, array(1.00))')[0].alias('Max')) \
-            .orderBy('Date') \
+            .orderBy('Year', 'Date') \
             .write.csv(sys.argv[2] if len(sys.argv)>2 else store_type + '.csv')
 
 
