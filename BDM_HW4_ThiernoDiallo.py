@@ -3,6 +3,7 @@ import datetime
 import csv
 import json
 from pyspark.sql.functions import *
+from pyspark.sql.types import *
 import pyspark
 
 if __name__ == '__main__':
