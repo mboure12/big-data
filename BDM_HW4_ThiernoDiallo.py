@@ -44,7 +44,7 @@ if __name__ == '__main__':
 
 
     def countClosedRest(store_type, cusips, NYC_CITIES):
-        stores = set(sc.textFile('data/share/bdm/core-places-nyc.csv')\
+        stores = set(sc.textFile('/data/share/bdm/core-places-nyc.csv')\
                      .map(lambda x: x.split(',')) \
                      .map(lambda x: (x[1], x[9], x[13])) \
                      .filter(lambda x: (x[1] in cusips) and (x[2] in NYC_CITIES))\
@@ -54,7 +54,7 @@ if __name__ == '__main__':
         udfgetYear = udf(get_year, StringType())
         udfgetDate = udf(get_date, StringType())
 
-        rdd = sc.textFile('data/share/bdm/weekly-patterns-nyc-2019-2020/*') \
+        rdd = sc.textFile('/data/share/bdm/weekly-patterns-nyc-2019-2020/*') \
             .mapPartitionsWithIndex(functools.partial(listDates, stores))
 
         if not rdd.isEmpty():
