@@ -36,8 +36,6 @@ def main(sc, spark):
     dfPattern = spark.read.csv('/data/share/bdm/weekly-patterns-nyc-2019-2020/*', header=True, escape='"')
     OUTPUT_PREFIX = sys.argv[1]
 
-    NYC_CITIES = set(['New York', 'Brooklyn', 'Queens', 'Bronx', 'Staten Island'])
-
     CAT_CODES = {'445210', '722515', '445299', '445120', '452210', '311811',
                  '722410', '722511', '445220', '445292', '445110', '445291',
                  '445230', '446191', '446110', '722513', '452311'}
@@ -48,7 +46,7 @@ def main(sc, spark):
                  '445210': 7, '445110': 8}
 
     dfD = dfPlaces \
-        .filter((F.col('naics_code').isin(CAT_CODES)) & (F.col('city').isin(NYC_CITIES))) \
+        .filter((F.col('naics_code').isin(CAT_CODES))) \
         .select(F.col('placekey'), F.col('naics_code')) \
         .distinct()
 
