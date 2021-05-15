@@ -15,16 +15,6 @@ def expandVisits(date_range_start, visits_by_day):
             for i, visit_per_day in enumerate(json.loads(visits_by_day))]
 
 
-def computeStats(group, visits):
-    list_size = groupCount[int(group)]
-    n = len(visits)
-    added_list = [0]*(list_size)
-    extended_visits = visits + added_list
-    median = int(np.median(extended_visits).astype(int))
-    low = int(median - np.std(extended_visits).astype(int))
-    high = int(median + np.std(extended_visits).astype(int))
-    return [median, max(low, 0), max(high, 0)]
-
 
 def main(sc, spark):
     '''
@@ -58,6 +48,16 @@ def main(sc, spark):
 
     groupCount = {int(row['group']): row['count'] for row in dfF.groupBy('group').count().collect()}
 
+    def computeStats(group, visits):
+        list_size = groupCount[int(group)]
+        n = len(visits)
+        added_list = [0] * list_size
+        extended_visits = visits + added_list
+        median = int(np.median(extended_visits).astype(int))
+        low = int(median - np.std(extended_visits).astype(int))
+        high = int(median + np.std(extended_visits).astype(int))
+        return [median, max(low, 0), max(high, 0)]
+
     visitType = T.StructType([T.StructField('year', T.IntegerType()),
                                 T.StructField('date', T.StringType()),
                               T.StructField('visits', T.IntegerType())])
@@ -79,7 +79,7 @@ def main(sc, spark):
         .withColumn('stats', udfComputeStats('group', 'visits'))
 
     dfJ = dfI \
-        .withColumn('date', concat(lit('2020-'), col('date'))) \
+        .withColumn('date', F.concat(F.lit('2020-'), F.col('date'))) \
         .select('group', 'year', 'date', 'stats.*') \
         .sort('group', 'year', 'date') \
         .cache()
