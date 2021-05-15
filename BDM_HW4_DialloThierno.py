@@ -84,20 +84,20 @@ def main(sc, spark):
         .sort('group', 'year', 'date') \
         .cache()
 
-    food_store = {'big_box_grocers': 0, 'convenience_stores': 1, 'drinking_places': 2,
-                  'full_service_restaurants': 3, 'limited_service_restaurants': 4,
-                  'pharmacies_and_drug_stores': 5, 'snack_and_bakeries': 6,
-                  'specialty_food_stores': 7, 'supermarkets_except_convenience_stores': 8}
+    food_store = ['big_box_grocers', 'convenience_stores', 'drinking_places',
+                  'full_service_restaurants', 'limited_service_restaurants',
+                  'pharmacies_and_drug_stores', 'snack_and_bakeries',
+                  'specialty_food_stores', 'supermarkets_except_convenience_stores']
 
-    for filename in food_store:
-        dfJ.filter(f'group={food_store[filename]}') \
+    for group, filename in enumerate(food_store):
+        dfJ.filter(f'group={group}') \
             .drop('group') \
             .coalesce(1) \
-            .write.csv(f'{OUTPUT_PREFIX}/{filename}',
-                       mode='overwrite', header=True)
+            .write.csv(f'{OUTPUT_PREFIX}/{filename}', mode='overwrite', header=True)
 
 
 if __name__ == '__main__':
     sc = SparkContext()
     spark = SparkSession(sc)
     main(sc, spark)
+
